@@ -48,7 +48,7 @@ var nodeInit = function (RED) {
                 switch (_a.label) {
                     case 0:
                         mail = new blastengine_1.Mail;
-                        params = (Object.keys(msg.payload).length === 0 ? { input: msg.payload } : msg.payload);
+                        params = (Object.keys(msg.payload || {}).length === 0 ? { input: msg.payload || "" } : msg.payload);
                         mail.setSubject(params.subject || config.subject);
                         mail.setFrom(params.fromemail || config.fromemail, params.fromname || config.fromname);
                         mail.setText(params.message || config.message);
@@ -56,8 +56,10 @@ var nodeInit = function (RED) {
                             mail.addCc(params.cc);
                         if (params.bcc)
                             mail.addBcc(params.bcc);
-                        if (!params.input)
+                        if (!params.input && params.input !== "") {
                             params.input = JSON.stringify(params);
+                        }
+                        console.log(params);
                         mail.addTo(params.to || config.to, params);
                         _a.label = 1;
                     case 1:

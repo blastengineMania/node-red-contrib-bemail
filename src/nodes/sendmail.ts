@@ -23,13 +23,16 @@ const nodeInit: NodeInitializer = (RED): void => {
     new BlastEngine(config.username, config.apikey);
     this.on("input", async (msg, send, done) => {
       const mail = new Mail;
-      const params = (Object.keys(msg.payload).length === 0 ? {input: msg.payload} : msg.payload) as {[key: string]: any};
+      const params = (Object.keys(msg.payload || {}).length === 0 ? {input: msg.payload || ""} : msg.payload) as {[key: string]: any};
       mail.setSubject(params.subject || config.subject);
       mail.setFrom(params.fromemail || config.fromemail, params.fromname || config.fromname);
       mail.setText(params.message || config.message);
       if (params.cc) mail.addCc(params.cc);
       if (params.bcc) mail.addBcc(params.bcc);
-      if (!params.input) params.input = JSON.stringify(params);
+      if (!params.input && params.input !== "") {
+        params.input = JSON.stringify(params);
+      }
+      console.log(params);
       mail.addTo(params.to || config.to, params);
       try {
         await mail.send();
